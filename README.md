@@ -21,14 +21,13 @@ Majd interaktív lépések
 > npx prisma init --datasource-provider mongodb<br>
 
 
-## 3. VS Code konfigurációs állományok létrehozása, vagy másolása
+## 3. Konfigurációs állományok létrehozása, vagy másolása
 .vscode/extensions.json (majd a VS Code indításakor a felajánlott bővítmények telepítése)
 ```
 {
     "recommendations": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "formulahendry.auto-rename-tag",
         "prisma.prisma"
     ]
 }
@@ -159,7 +158,10 @@ export default [
 }
 ```
 
-### 4 .env - connection string beállítása (local MongoDB szerverhez)
+## 4. data és lib mappák másolása, adatbázis fileok kibontása
+
+
+## 4. A .env állományban a connection string beállítása (local MongoDB szerverhez)
 ```
 DATABASE_URL="mongodb://localhost:27017/sampleDB"
 ```
@@ -168,11 +170,11 @@ ha Mongo Atlas-t használsz:
 DATABASE_URL="mongodb+srv://user_name:user_password@sandbox.abcdef.mongodb.net/sampleDB?retryWrites=true&w=majority&authSource=admin"
 ```
 
-### 1.5 Prisma Schema létrehozása (minta Film modell) ./prisma/schema.prisma
+## 5. Prisma Schema létrehozása (minta Film modell) ./prisma/schema.prisma
 ```
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma-client"
+  output   = "../app/generated/prisma"
 }
 
 datasource db {
@@ -196,7 +198,7 @@ majd:
 > npx prisma generate<br>
 
 
-### 1.5.1 A Prisma Schema-t a feltöltött (forrás) adatbázistáblákból is létrehozhatjuk
+## 6. A Prisma Schema-t a feltöltött (forrás) adatbázistáblákból is létrehozhatjuk
 > npx prisma db pull --force<br>
 
 majd a Prisma Schema finomítása után:
@@ -204,11 +206,11 @@ majd a Prisma Schema finomítása után:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-### 1.6 Minden változás után szinkronizálás az adatbázissal és a Prisma Client frissítése:
+## 7. Minden változás után szinkronizálás az adatbázissal és a Prisma Client frissítése:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-### 1.7 Local MongoDB indítása replica set-el
+### 8. Local MongoDB indítása replica set-el
 
 > data/startMongoDB.bat
 
