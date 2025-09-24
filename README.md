@@ -18,8 +18,13 @@ Majd interaktív lépések
 > npm i -D prisma typescript-eslint<br>
 > npm i -g tsx<br>
 > npm i @prisma/client<br>
-> npx prisma init --datasource-provider mongodb<br>
+> npx prisma init<br>
 
+### 2.1 ./prisma/schma.prisma
+Sor törlése:
+> output   = "../app/generated/prisma"<br>
+MongoDB database-provider beállítása:
+> provider = "mongodb"
 
 ## 3. Konfigurációs állományok létrehozása, vagy másolása
 .vscode/extensions.json (majd a VS Code indításakor a felajánlott bővítmények telepítése)
@@ -200,7 +205,6 @@ DATABASE_URL="mongodb+srv://user_name:user_password@sandbox.abcdef.mongodb.net/s
 ```
 generator client {
   provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
 }
 
 datasource db {
@@ -236,9 +240,9 @@ majd a Prisma Schema finomítása után:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-## 11. Adatbázis vizsgálata: Prisma Studio
+## 11. Adatok kezelése az adatbázisban: Prisma Studio
 > npx prisma studio
 
-## 12. Adatbázis vizsgálata: Mongo Compass (indítás a startmenüből)
+## 12. Adatok kezelése az adatbázisban: Mongo Compass (indítás a startmenüből)
 
 ## 13. Végpontok tesztelése: Postman
