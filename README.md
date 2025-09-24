@@ -189,7 +189,14 @@ DATABASE_URL="mongodb+srv://user_name:user_password@sandbox.abcdef.mongodb.net/s
 
 > data/startMongoDB.bat
 
-## 7. Prisma Schema létrehozása (minta Film modell) ./prisma/schema.prisma
+## 7. Replica set inicializálása (csak egyszer kell az adatbázis tároló ("c:\data\db) létrehozásakor, megőrzésre kerül a beállítás)
+### 7.1 mongo shell indítása
+> mongosh
+### 7.2. replica set inicializálása
+> rs.initiate()
+
+
+## 8. Prisma Schema létrehozása (minta Film modell) ./prisma/schema.prisma
 ```
 generator client {
   provider = "prisma-client-js"
@@ -217,7 +224,7 @@ majd:
 > npx prisma generate<br>
 
 
-## 8. A Prisma Schema-t a feltöltött (forrás) adatbázistáblákból is létrehozhatjuk
+## 9. A Prisma Schema-t a feltöltött (forrás) adatbázistáblákból is létrehozhatjuk
 > npx prisma db pull --force<br>
 
 majd a Prisma Schema finomítása után:
@@ -225,17 +232,13 @@ majd a Prisma Schema finomítása után:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-## 9. Minden schema változás után szinkronizálás az adatbázissal és a Prisma Client frissítése:
+## 10. Minden schema változás után szinkronizálás az adatbázissal és a Prisma Client frissítése:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-# Egyéb
-
-## 1. Replica set inicializálása (csak egyszer kell az adatbázis tároló ("c:\data\db) létrehozásakor, megőrzésre kerül a beállítás)
-### 1.1 mongo shell indítása
-> mongosh
-### 1.2. replica set inicializálása
-> rs.initiate()
-
-## 2. Prisma Studio indítása
+## 11. Adatbázis vizsgálata: Prisma Studio
 > npx prisma studio
+
+## 12. Adatbázis vizsgálata: Mongo Compass (indítás a startmenüből)
+
+## 13. Végpontok tesztelése: Postman
