@@ -158,19 +158,38 @@ export default [
 }
 ```
 
-## 4. data és lib mappák másolása, adatbázis fileok kibontása
+## 4. startMongoDB.bat és prisma.ts allományok létrehozása/másolása
+./data/startMongoDB.bat
+```
+if not exist "c:\data\" mkdir "c:\data"
+if not exist "c:\data\db" mkdir "c:\data\db"
+"c:\Program Files\MongoDB\Server\8.2\bin\mongod.exe" --dbpath="c:\data\db" --replSet "rs0"
+```
+./lib/prisma.ts
+```
+// https://www.prisma.io/docs/orm/more/help-and-troubleshooting/nextjs-help
+import { PrismaClient } from "@/app/generated/prisma";
+
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const prisma = globalForPrisma.prisma || new PrismaClient();
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+```
 
 
-## 4. A .env állományban a connection string beállítása (local MongoDB szerverhez)
+## 5. A ".env" állományban a connection string beállítása local MongoDB szerverhez
 ```
 DATABASE_URL="mongodb://localhost:27017/sampleDB"
 ```
-ha Mongo Atlas-t használsz:
+Mongo Atlas-t esetén:
 ```
 DATABASE_URL="mongodb+srv://user_name:user_password@sandbox.abcdef.mongodb.net/sampleDB?retryWrites=true&w=majority&authSource=admin"
 ```
 
-## 5. Prisma Schema létrehozása (minta Film modell) ./prisma/schema.prisma
+## 6. Local MongoDB indítása replica set-el
+
+> data/startMongoDB.bat
+
+## 7. Prisma Schema létrehozása (minta Film modell) ./prisma/schema.prisma
 ```
 generator client {
   provider = "prisma-client-js"
@@ -198,7 +217,7 @@ majd:
 > npx prisma generate<br>
 
 
-## 6. A Prisma Schema-t a feltöltött (forrás) adatbázistáblákból is létrehozhatjuk
+## 8. A Prisma Schema-t a feltöltött (forrás) adatbázistáblákból is létrehozhatjuk
 > npx prisma db pull --force<br>
 
 majd a Prisma Schema finomítása után:
@@ -206,120 +225,17 @@ majd a Prisma Schema finomítása után:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-## 7. Minden változás után szinkronizálás az adatbázissal és a Prisma Client frissítése:
+## 9. Minden schema változás után szinkronizálás az adatbázissal és a Prisma Client frissítése:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-### 8. Local MongoDB indítása replica set-el
+# Egyéb
 
-> data/startMongoDB.bat
-
-### 1.8 Replica set inicializálása (csak egyszer kell az adatbázis tároló ("c:\data\db) létrehozásakor, megőrzésre kerül a beállítás)
-#### 1. mongo shell indítása
+## 1. Replica set inicializálása (csak egyszer kell az adatbázis tároló ("c:\data\db) létrehozásakor, megőrzésre kerül a beállítás)
+### 1.1 mongo shell indítása
 > mongosh
-#### 2. replica set inicializálása
+### 1.2. replica set inicializálása
 > rs.initiate()
 
-### 1.9 Több Prisma Client futtatásának megakadályozása
-```
-// lib/prisma.ts
-// https://www.prisma.io/docs/orm/more/help-and-troubleshooting/nextjs-help
-
-import { PrismaClient } from "@/app/generated/prisma-client";
-
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
-
-const prisma = globalForPrisma.prisma || new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
-
-export default prisma;
-```
-### 1.10 API útvonalak létrehozása (GET all, POST), hibakezelés nélkül
-```
-// @/app/posts/route.ts
-
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
-// GET all posts
-export async function GET() {
-  const posts = await prisma.post.findMany();
-  return NextResponse.json(posts);
-}
-
-// CREATE a post with POST method
-export async function POST(req: Request) {
-  const { title, content } = await req.json();
-  const newPost = await prisma.post.create({
-    data: { title, content },
-  });
-  return NextResponse.json(newPost);
-}
-```
-### 1.11 Dinamikus ([id]) API útvonalak létrehozása (GET one, UPDATE, DELETE, PATCH), hibakezelés nélkül
-```
-// @/app/api/posts/[id]/route.ts
-
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
-// GET one post
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const post = await prisma.post.findUnique({
-    where: { id: params.id },
-  });
-  return NextResponse.json(post);
-}
-
-// UPDATE one post
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const { title, content } = await req.json();
-  const updated = await prisma.post.update({
-    where: { id: params.id },
-    data: { title, content },
-  });
-  return NextResponse.json(updated);
-}
-
-// DELETE one post
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  await prisma.post.delete({
-    where: { id: params.id },
-  });
-  return NextResponse.json({ message: "Deleted successfully" });
-}
-```
-### 1.14 Egyszerű hibakezelés minta
-```
-// CREATE "ingatlan" with POST method
-export async function POST(req: Request) {
-  try {
-    const data = await req.json();
-    const newIngatlan = await prisma.ingatlanok.create({
-      data: data,
-    });
-    return NextResponse.json(newIngatlan, { status: 201 });
-  } catch (error: Error | unknown) {
-    if (error instanceof Error) {
-      if (error.message.includes('Unique constraint failed')) {
-        return NextResponse.json({ message: 'Az azonosító már létezik!' }, { status: 409 });
-      }
-      return NextResponse.json({ message: error.message }, { status: 500 });
-    } else {
-      return NextResponse.json({ message: 'Unknown error' }, { status: 500 });
-    }
-  }
-}
-```
-### 1.13 Prisma Studio indítása
+## 2. Prisma Studio indítása
 > npx prisma studio
