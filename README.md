@@ -20,13 +20,14 @@ Majd interaktív lépések
 > npm i @prisma/client<br>
 > npx prisma init<br>
 
-### 2.1 ./prisma/schma.prisma
-Sor törlése:
-> output   = "../app/generated/prisma"<br>
-MongoDB database-provider beállítása:
-> provider = "mongodb"
+## 3. Prisma konfigurálása: ./prisma/schma.prisma
+Output sor módosítása:
+> output   = "../lib/generated/prisma"<br>
 
-## 3. Konfigurációs állományok létrehozása, vagy másolása
+MongoDB database-provider beállítása:
+> provider = "mongodb"<br>
+
+## 4. Konfigurációs állományok létrehozása, vagy másolása
 .vscode/extensions.json (majd a VS Code indításakor a felajánlott bővítmények telepítése)
 ```
 {
@@ -163,7 +164,7 @@ export default [
 }
 ```
 
-## 4. startMongoDB.bat és prisma.ts allományok létrehozása/másolása
+## 5. startMongoDB.bat és prisma.ts allományok létrehozása/másolása
 ./data/startMongoDB.bat
 ```
 if not exist "c:\data\" mkdir "c:\data"
@@ -173,7 +174,7 @@ if not exist "c:\data\db" mkdir "c:\data\db"
 ./lib/prisma.ts
 ```
 // https://www.prisma.io/docs/orm/more/help-and-troubleshooting/nextjs-help
-import { PrismaClient } from "@/app/generated/prisma";
+import { PrismaClient } from "@/lib/generated/prisma";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 const prisma = globalForPrisma.prisma || new PrismaClient();
@@ -181,7 +182,7 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 ```
 
 
-## 5. A ".env" állományban a connection string beállítása local MongoDB szerverhez
+## 6. A ".env" állományban a connection string beállítása local MongoDB szerverhez
 ```
 DATABASE_URL="mongodb://localhost:27017/sampleDB"
 ```
@@ -190,21 +191,22 @@ Mongo Atlas-t esetén:
 DATABASE_URL="mongodb+srv://user_name:user_password@sandbox.abcdef.mongodb.net/sampleDB?retryWrites=true&w=majority&authSource=admin"
 ```
 
-## 6. Local MongoDB indítása replica set-el
+## 7. Local MongoDB indítása replica set-el
 
 > data/startMongoDB.bat
 
-## 7. Replica set inicializálása (csak egyszer kell az adatbázis tároló ("c:\data\db) létrehozásakor, megőrzésre kerül a beállítás)
-### 7.1 mongo shell indítása
+## 8. Replica set inicializálása (csak egyszer kell az adatbázis tároló ("c:\data\db) létrehozásakor, megőrzésre kerül a beállítás)
+### 8.1 mongo shell indítása
 > mongosh
-### 7.2. replica set inicializálása
+### 8.2. replica set inicializálása
 > rs.initiate()
 
 
-## 8. Prisma Schema létrehozása (minta Film modell) ./prisma/schema.prisma
+## 9. Prisma Schema létrehozása (minta Film modell) ./prisma/schema.prisma
 ```
 generator client {
   provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
 }
 
 datasource db {
@@ -228,7 +230,7 @@ majd:
 > npx prisma generate<br>
 
 
-## 9. A Prisma Schema-t a feltöltött (forrás) adatbázistáblákból is létrehozhatjuk
+## 10. A Prisma Schema-t a feltöltött (forrás) adatbázistáblákból is létrehozhatjuk
 > npx prisma db pull --force<br>
 
 majd a Prisma Schema finomítása után:
@@ -236,13 +238,13 @@ majd a Prisma Schema finomítása után:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-## 10. Minden schema változás után szinkronizálás az adatbázissal és a Prisma Client frissítése:
+## 11. Minden schema változás után szinkronizálás az adatbázissal és a Prisma Client frissítése:
 > npx prisma db push<br>
 > npx prisma generate<br>
 
-## 11. Adatok kezelése az adatbázisban: Prisma Studio
+## 12. Adatok kezelése az adatbázisban: Prisma Studio
 > npx prisma studio
 
-## 12. Adatok kezelése az adatbázisban: Mongo Compass (indítás a startmenüből)
+## 13. Adatok kezelése az adatbázisban: Mongo Compass (indítás a startmenüből)
 
-## 13. Végpontok tesztelése: Postman
+## 14. Végpontok tesztelése: Postman
